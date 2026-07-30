@@ -20,7 +20,11 @@ async def main_handler(message: types.Message):
         await message.answer(text)
 
     elif text == "Дополнительные рассылки":
-        ...
+        text = (
+            "❌ В данный момент Вы не подписаны на дополнительные новостные и акционные рассылки.\n\n"
+            "⚠️ Вы упускаете возможность быть в курсе всех новостей и акций!"
+        )
+        return await message.answer(text)
 
 @dp.message_handler(commands=["start"])
 async def start_message(message: types.Message):
