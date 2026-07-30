@@ -16,7 +16,7 @@ async def generate_code(userId):
     ttl_seconds = await client.ttl(key)
 
     if ttl_seconds > 0:
-        ttl_minutes = round(ttl_seconds / 60, 1)
+        ttl_minutes = round(ttl_seconds / 60)
         return None, ttl_minutes
 
     while True:
