@@ -1,11 +1,11 @@
-import aioredis
+import redis.asyncio as aioredis
 import os
 import random
 
 client = aioredis.Redis(
-    host=os.getenv("REDIS_HOST", "localhost"),
-    port=int(os.getenv("REDIS_PORT", 6379)),
-    password=os.getenv("REDIS_PASSWORD", None),
+    host=os.getenv("redis_host", "localhost"),
+    port=int(os.getenv("redis_port", 6379)),
+    password=os.getenv("redis_password", None),
     db=0,
     decode_responses=True,
 )
