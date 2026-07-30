@@ -10,6 +10,7 @@ import os
 async def callback_handler(callback: types.CallbackQuery):
     button = callback.data
 
+    await callback.answer("")
     is_subscribed = await check_subscribe(callback.from_user.id)
 
     if button == "get_code":
