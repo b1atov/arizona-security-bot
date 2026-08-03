@@ -1,6 +1,7 @@
 import redis.asyncio as aioredis
 import os
-import random
+import secrets
+import math
 
 client = aioredis.Redis(
     host=os.getenv("redis_host", "localhost"),
@@ -13,23 +14,15 @@ client = aioredis.Redis(
 async def generate_code(userId):
     key = f"code_cooldown:{userId}"
 
-    ttl_seconds = await client.ttl(key)
-
-    if ttl_seconds > 0:
-        ttl_minutes = round(ttl_seconds / 60)
+    if not await client.set(name=key, value="", ex=600, nx=True):
+        ttl_seconds = await client.ttl(key)
+        ttl_minutes = max(1, math.ceil(ttl_seconds / 60)) if ttl_seconds > 0 else 1
         return None, ttl_minutes
 
     while True:
-        code = f"{random.randint(0, 999999):06d}"
+        code = f"{secrets.randbelow(1_000_000):06d}"
         code_key = f"active_code:{code}"
 
-        code_exists = await client.exists(code_key)
-
-        if not code_exists:
-            async with client.pipeline(transaction=True) as pipe:
-                pipe.set(name=key, value=code, ex=600)
-                pipe.set(name=code_key, value=userId, ex=600)
-                await pipe.execute()
-            break
-
-    return code, 0
+        if await client.set(name=code_key, value=userId, ex=600, nx=True):
+            await client.set(name=key, value=code, ex=600)
+            return code, 0
